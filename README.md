@@ -1,70 +1,99 @@
-# Getting Started with Create React App
+## Setup project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- create-react-app
+- reset `src/`
+- Installation
+  `npm i redux react-redux redux-devtools-extension`
 
-## Available Scripts
+## Counter
 
-In the project directory, you can run:
+- `src/features/counter/reducer.js`:
 
-### `npm start`
+```js
+const INCREMENT = "COUNTER.INCREMENT";
+const DECREMENT = "COUNTER.DECREMENT";
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+const initialState = {
+  count: 0,
+};
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+const counterReducer = (state = initialState, action) => {
+  const { type } = action;
+  switch (type) {
+    case INCREMENT:
+      return { count: state.count + 1 };
+    case DECREMENT:
+      return { count: state.count - 1 };
 
-### `npm test`
+    default:
+      return state;
+  }
+};
+export default counterReducer;
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- `src/app/store.js`:
 
-### `npm run build`
+```js
+import { createStore, combineReducers } from "redux";
+import counterReducer from "../features/counter/reducer";
+import { composeWithDevTools } from "redux-devtools-extension";
+//globalstate
+const initialState = {};
+const store = createStore(
+  combineReducers({
+    counter: counterReducer,
+  }),
+  initialState,
+  composeWithDevTools()
+);
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+export default store;
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- `src/features/counter/Counter.js`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```js
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-### `npm run eject`
+const Counter = () => {
+  const dispatch = useDispatch();
+  const count = useSelector((state) => state.counter.count);
+  return (
+    <div>
+      <button onClick={() => dispatch({ type: "COUNTER.INCREMENT" })}>+</button>
+      <span> {count} </span>
+      <button onClick={() => dispatch({ type: "COUNTER.DECREMENT" })}>-</button>
+    </div>
+  );
+};
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+export default Counter;
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- `src/index.js`
+- `import the provider,store to index.js`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```js
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import store from "./app/store";
+import { Provider } from "react-redux";
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </React.StrictMode>
+);
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+```
