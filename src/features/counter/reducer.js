@@ -6,7 +6,7 @@ const initialState = {
 };
 
 const counterReducer = (state = initialState, action) => {
-  const { type, payload } = action;
+  const { type } = action;
   switch (type) {
     case INCREMENT:
       return { count: state.count + 1 };
